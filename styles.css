@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.active {
+    @apply bg-indigo-700 text-white shadow-lg shadow-indigo-300 border-indigo-700;    
+}
+.active svg{
+    @apply fill-white
+}
+
+.not-active {
+    @apply bg-indigo-50  border-indigo-50 
+}
+.not-active svg {
+    @apply fill-indigo-600
+}
+
+.add-line {
+    @apply line-through
+}
+
