@@ -11,6 +11,34 @@ const $createTaskButton = document.querySelector('#task-button')
 const $folderDeleteButton = document.querySelector('#delete-button')
 const $taskList = document.querySelector('#task')
 //const $folder = document.querySelector('.folder')
+let folderSelected = false;
+let selectedDivID;
+
+$createTaskButton.addEventListener('click', (e) => {
+    if(folderSelected){
+        if($taskInput.value === ""){
+            return
+        }else{
+            //console.log($taskInput.value)
+            const taskInputValue = $taskInput.value
+            const $task = document.createElement('div')
+            $task.innerHTML = 
+                `<div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
+                <div class=" flex-1 flex items-center">
+                <input type="checkbox">
+                <p class="ml-3">${taskInputValue}</p>
+                </div>
+                <div class="flex-1 flex item-center justify-end">
+                    <img class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
+                    <img class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
+                </div>
+                </div>`
+            $taskList.appendChild($task)
+            createTask(selectedDivID,$taskInput.value) 
+        }
+        $taskInput.value = ""
+    }
+});
 
 // Create and delete folders 
 $createFolderButton.addEventListener('click', () => {
@@ -24,6 +52,8 @@ $createFolderButton.addEventListener('click', () => {
                 <img id="delete-button" class="ml-2" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
             </div>`
         $folderList.appendChild($folder);
+
+        
         //Delete Folders
         $folder.addEventListener('click', (e) => {
             let img = e.target.closest('img')
@@ -33,46 +63,15 @@ $createFolderButton.addEventListener('click', () => {
             deleteFolder(divID)
             $folder.remove(img)
         })
+
         //Active folder
         $folder.addEventListener('click', (e) => {
-            const divId = e.path[0].id
+            selectedDivID = e.path[0].id;
             //$taskList.innerHTML = ""
-            
-            setActiveFolder(divId)
-            
-            folders.forEach(folder => {
-                if(folder.active === true){
-                   console.log(`Active Folder: ${folder.folderName}`)
-                   //Create Task 
-                   $createTaskButton.addEventListener('click', (e) => {
-                
-                        if($taskInput.value === ""){
-                            return
-                        }else{
-                            console.log($taskInput.value)
-                            const taskInputValue = $taskInput.value
-                            const $task = document.createElement('div')
-                            $task.innerHTML = 
-                                `<div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
-                                <div class=" flex-1 flex items-center">
-                                <input type="checkbox">
-                                <p class="ml-3">${taskInputValue}</p>
-                                </div>
-                                <div class="flex-1 flex item-center justify-end">
-                                    <img class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
-                                    <img class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
-                                </div>
-                                </div>`
-                            $taskList.appendChild($task)
-                            createTask(divId,$taskInput.value) 
-                        }
-                        $taskInput.value = ""
-                   })
-                   folders.forEach(folder => {
-                    console.log(folder.tasks)
-                   })
-                }
-            })
+
+            setActiveFolder(selectedDivID)
+            displayTasks()
+
         })
         $folderInput.value = ""
     }
@@ -86,7 +85,7 @@ const createFolder = (folderName) => {
         tasks: []
     }
     folders.push(folder)
-    console.log('Creating Folder:')
+    //console.log('Creating Folder:')
     printFolders()
     return folder.id
 }
@@ -96,20 +95,30 @@ const deleteFolder = (folderId) => {
         return folder.id !== folderId
     })
 
-    console.log(`Deleting Folder: ${folderId}`)
+    //console.log(`Deleting Folder: ${folderId}`)
     printFolders()
 }
 
 const setActiveFolder = (folderId) => {
+    folderSelected = true;
     folders.forEach(folder => {
         if(folderId === folder.id){
             folder.active = true
+            console.log("End Tasks");
         }else{
             folder.active = false
         }
     })
-    console.log(`Setting Active Folder: ${folderId}`)
+    //console.log(`Setting Active Folder: ${folderId}`)
     printFolders()
+}
+
+const displayTasks = () => {
+    folders.forEach(folder => {
+        if(folder.active){
+            folder.tasks.forEach(task => console.log("Tasks: " +task.task))
+        }
+    });
 }
 
 const createTask = (folderId, task) => {
@@ -124,7 +133,7 @@ const createTask = (folderId, task) => {
             folder.tasks.push(task)
         }
     })
-    console.log(`Creating Task: ${task.id}`)
+    //console.log(`Creating Task: ${task.id}`)
     printFolders()
     return id
 }
@@ -137,7 +146,7 @@ const deleteTask = (folderId, taskId) => {
             })
         }
     })
-    console.log(`Deleting task: ${taskId}`)
+    //console.log(`Deleting task: ${taskId}`)
 
     printFolders()
 }
@@ -152,7 +161,7 @@ const editTask = (folderId,taskId,newTask) => {
             })
         }
     })
-    console.log(`Editing task ${taskId}`)
+    //console.log(`Editing task ${taskId}`)
     printFolders()
 }
 
@@ -166,18 +175,18 @@ const toggleTask = (folderId,taskId) => {
             })
         }
     })
-    console.log(`Toggling Task: ${taskId} in Folder: ${folderId}`)
+    //console.log(`Toggling Task: ${taskId} in Folder: ${folderId}`)
     printFolders()
 }
 
 const printFolders = () => {
-    console.log(folders)
+    //console.log(folders)
 }
 
 const printTasks = (folderId) => {
     folders.forEach(folder => {
         if(folderId === folder.id){
-            console.log(folder.tasks)
+            //console.log(folder.tasks)
         }
     })
 }
