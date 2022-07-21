@@ -14,16 +14,16 @@ const $taskList = document.querySelector('#task')
 let folderSelected = false;
 let selectedDivID;
 
+//Create Task 
 $createTaskButton.addEventListener('click', (e) => {
     if(folderSelected){
         if($taskInput.value === ""){
             return
         }else{
-            //console.log($taskInput.value)
             const taskInputValue = $taskInput.value
             const $task = document.createElement('div')
-            $task.innerHTML = 
-                `<div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
+            $task.innerHTML =
+                `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
                 <div class=" flex-1 flex items-center">
                 <input type="checkbox">
                 <p class="ml-3">${taskInputValue}</p>
@@ -32,7 +32,7 @@ $createTaskButton.addEventListener('click', (e) => {
                     <img class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
                     <img class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
                 </div>
-                </div>`
+                </div></li>`
             $taskList.appendChild($task)
             createTask(selectedDivID,$taskInput.value) 
         }
@@ -67,8 +67,6 @@ $createFolderButton.addEventListener('click', () => {
         //Active folder
         $folder.addEventListener('click', (e) => {
             selectedDivID = e.path[0].id;
-            //$taskList.innerHTML = ""
-
             setActiveFolder(selectedDivID)
             displayTasks()
 
@@ -85,7 +83,7 @@ const createFolder = (folderName) => {
         tasks: []
     }
     folders.push(folder)
-    //console.log('Creating Folder:')
+    console.log('Creating Folder:')
     printFolders()
     return folder.id
 }
@@ -95,7 +93,7 @@ const deleteFolder = (folderId) => {
         return folder.id !== folderId
     })
 
-    //console.log(`Deleting Folder: ${folderId}`)
+    console.log(`Deleting Folder: ${folderId}`)
     printFolders()
 }
 
@@ -104,19 +102,74 @@ const setActiveFolder = (folderId) => {
     folders.forEach(folder => {
         if(folderId === folder.id){
             folder.active = true
-            console.log("End Tasks");
         }else{
             folder.active = false
         }
     })
-    //console.log(`Setting Active Folder: ${folderId}`)
+    console.log(`Setting Active Folder: ${folderId}`)
     printFolders()
 }
 
 const displayTasks = () => {
     folders.forEach(folder => {
         if(folder.active){
-            folder.tasks.forEach(task => console.log("Tasks: " +task.task))
+
+            //Clear task list currently being displayed
+            $taskList.innerHTML = '';
+
+            //Display task list from selected folder
+            folder.tasks.forEach(task => {
+                const $task = document.createElement('div')
+                $task.innerHTML =
+                    `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
+                    <div class=" flex-1 flex items-center">
+                    <input class="completed-task" type="checkbox">
+                    <p class="ml-3">${task.task}</p>
+                    </div>
+                    <div class="flex-1 flex item-center justify-end">
+                        <img id= ${task.id} class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
+                        <img id= ${task.id} class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
+                    </div>
+                    </div></li>`
+
+                    // delete task button listener 
+                    $task.addEventListener('click', (e) => {
+                        let deleteButton = e.target.className
+                        if(deleteButton.includes('delete-button')){
+                           let taskId = e.path[0].id
+                           if(!taskId) return;
+                        
+                           console.log('delete button');
+                           deleteTask(taskId);
+                           displayTasks()
+                        };
+                    });
+
+                    //edit task button listener
+                    $task.addEventListener('click', (e) => {
+                        let editButton = e.target.className
+                        if(editButton.includes('edit-button')){
+                           let taskId= e.path[0].id
+                           if(!taskId) return;
+                           let newTask = prompt('Enter new task');
+                           editTask(taskId, newTask)
+                           displayTasks()
+                        }
+                    })
+
+                    //completed task button listener 
+                    $task.addEventListener('click', (e) => {
+                        let completedTask = e.target.className
+                        if(completedTask.includes(completedTask)){
+                            let taskId = e.path[0].id
+                            if(!taskId) return;
+                            completedTask(taskId)
+                            displayTasks()
+                        }
+                    })
+
+                    $taskList.appendChild($task)
+            });
         }
     });
 }
@@ -133,60 +186,63 @@ const createTask = (folderId, task) => {
             folder.tasks.push(task)
         }
     })
-    //console.log(`Creating Task: ${task.id}`)
+    console.log(`Creating Task: ${task.id}`)
     printFolders()
     return id
 }
 
-const deleteTask = (folderId, taskId) => {
+const deleteTask = (taskId) => {
+
     folders.forEach(folder => {
-        if(folderId === folder.id){
-           folder.tasks = folder.tasks.filter(task => {
+        folder.tasks.forEach(task => {
+            if(taskId === task.id){
+               folder.tasks = folder.tasks.filter(task => {
                 return taskId !== task.id
-            })
-        }
+               }) 
+            }
+        })
     })
-    //console.log(`Deleting task: ${taskId}`)
+    console.log(`Deleting task: ${taskId}`)
 
     printFolders()
 }
 
-const editTask = (folderId,taskId,newTask) => {
+const editTask = (taskId,newTask) => {
     folders.forEach(folder => {
-        if(folderId === folder.id){
             folder.tasks.forEach(task => {
                 if(task.id === taskId){
                     task.task = newTask
                 }
             })
-        }
     })
-    //console.log(`Editing task ${taskId}`)
+    console.log(`Editing task ${taskId}`)
     printFolders()
 }
 
-const toggleTask = (folderId,taskId) => {
+const toggleTask = (taskId) => {
     folders.forEach(folder => {
-        if(folderId === folder.id){
             folder.tasks.forEach(task => {
                 if(task.id === taskId){
-                    task.completed = !task.completed 
+                    task.completed = !task.completed
+                    if(task.completed === true){
+                        
+                    } 
                 }
             })
-        }
+        
     })
-    //console.log(`Toggling Task: ${taskId} in Folder: ${folderId}`)
+    console.log(`Toggling Task: ${taskId} in Folder: ${folderId}`)
     printFolders()
 }
 
 const printFolders = () => {
-    //console.log(folders)
+    console.log(folders)
 }
 
 const printTasks = (folderId) => {
     folders.forEach(folder => {
         if(folderId === folder.id){
-            //console.log(folder.tasks)
+            console.log(folder.tasks)
         }
     })
 }
