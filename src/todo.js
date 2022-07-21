@@ -10,7 +10,8 @@ const $taskInput = document.querySelector('#task-input');
 const $createTaskButton = document.querySelector('#task-button')
 const $folderDeleteButton = document.querySelector('#delete-button')
 const $taskList = document.querySelector('#task')
-//const $folder = document.querySelector('.folder')
+//const $taskText = document.getElementById('task-text')
+
 let folderSelected = false;
 let selectedDivID;
 
@@ -26,7 +27,7 @@ $createTaskButton.addEventListener('click', (e) => {
                 `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
                 <div class=" flex-1 flex items-center">
                 <input type="checkbox">
-                <p class="ml-3">${taskInputValue}</p>
+                <p id="task-text" class="ml-3">${taskInputValue}</p>
                 </div>
                 <div class="flex-1 flex item-center justify-end">
                     <img class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
@@ -62,13 +63,14 @@ $createFolderButton.addEventListener('click', () => {
             const divID = e.path[1].id 
             deleteFolder(divID)
             $folder.remove(img)
+            displayTasks()
         })
 
         //Active folder
         $folder.addEventListener('click', (e) => {
             selectedDivID = e.path[0].id;
             setActiveFolder(selectedDivID)
-            displayTasks()
+            // displayTasks()
 
         })
         $folderInput.value = ""
@@ -107,6 +109,7 @@ const setActiveFolder = (folderId) => {
         }
     })
     console.log(`Setting Active Folder: ${folderId}`)
+    displayTasks()
     printFolders()
 }
 
@@ -123,8 +126,8 @@ const displayTasks = () => {
                 $task.innerHTML =
                     `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
                     <div class=" flex-1 flex items-center">
-                    <input class="completed-task" type="checkbox">
-                    <p class="ml-3">${task.task}</p>
+                    <input id="${task.id}" class="completed-task ${task.id}" type="checkbox">
+                    <p id="task-text" class="ml-3 task-text">${task.task}</p>
                     </div>
                     <div class="flex-1 flex item-center justify-end">
                         <img id= ${task.id} class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
@@ -159,12 +162,18 @@ const displayTasks = () => {
 
                     //completed task button listener 
                     $task.addEventListener('click', (e) => {
+                        //const $taskText = document.getElementById('task-text')
+                        //find correct button 
                         let completedTask = e.target.className
-                        if(completedTask.includes(completedTask)){
+                        console.log(completedTask)
+
+                        if(completedTask.includes('completed-task')){
                             let taskId = e.path[0].id
+                            console.log(taskId)
                             if(!taskId) return;
-                            completedTask(taskId)
-                            displayTasks()
+                            toggleTask(taskId) 
+                            // $taskText.classList.add('line-through')
+                            //displayTasks()
                         }
                     })
 
@@ -203,7 +212,6 @@ const deleteTask = (taskId) => {
         })
     })
     console.log(`Deleting task: ${taskId}`)
-
     printFolders()
 }
 
@@ -220,18 +228,23 @@ const editTask = (taskId,newTask) => {
 }
 
 const toggleTask = (taskId) => {
+    const $taskText = document.getElementById('task-text')
+
     folders.forEach(folder => {
             folder.tasks.forEach(task => {
                 if(task.id === taskId){
                     task.completed = !task.completed
+                    console.log(task.completed)
                     if(task.completed === true){
-                        
-                    } 
+                       $taskText.classList.add('line-through')
+                    }else{
+                        $taskText.classList.remove('line-through')
+                    }
                 }
             })
         
     })
-    console.log(`Toggling Task: ${taskId} in Folder: ${folderId}`)
+    console.log(`Toggling Task: ${taskId}`)
     printFolders()
 }
 
@@ -260,130 +273,3 @@ const PUBLIC_API = {
 }
 
 export default PUBLIC_API;
-
-// import { generateId } from "./helpers.js"
-
-// let folders = []
-
-// // DOM elements 
-// const $folderInput = document.querySelector('.folder-form');
-// const $createFolderButton = document.querySelector('.create-form');
-// const $taskInput = document.querySelector('.task-input');
-// const $createTaskButton = document.querySelector('.task-button')
-
-// const createFolder = (folderName) => {
-//     const folder = {
-//         folderName,
-//         active: false,
-//         id: generateId(),
-//         tasks: []
-//     }
-//     folders.push(folder)
-//     console.log('Creating Folder:')
-//     printFolders()
-//     return folder.id
-// }
-
-// const deleteFolder = (folderId) => {
-//     folders = folders.filter(folder => {
-//         return folder.id !== folderId
-//     })
-
-//     console.log(`Deleting Folder: ${folderId}`)
-//     printFolders()
-// }
-
-// const setActiveFolder = (folderId) => {
-//     folders.forEach(folder => {
-//         if(folderId === folder.id){
-//             folder.active = true
-//         }else{
-//             folder.active = false
-//         }
-//     })
-//     console.log(`Setting Active Folder: ${folderId}`)
-//     printFolders()
-// }
-
-// const createTask = (folderId, task) => {
-//     const id = generateId()
-//     folders.forEach(folder => {
-//         if(folderId === folder.id){
-//             task = {
-//                 id,
-//                 task,
-//                 completed: false
-//             }
-//             folder.tasks.push(task)
-//         }
-//     })
-//     printFolders()
-//     return id
-// }
-
-// const deleteTask = (folderId, taskId) => {
-//     folders.forEach(folder => {
-//         if(folderId === folder.id){
-//            folder.tasks = folder.tasks.filter(task => {
-//                 return taskId !== task.id
-//             })
-//         }
-//     })
-//     console.log(`Deleting task: ${taskId}`)
-
-//     printFolders()
-// }
-
-// const editTask = (folderId,taskId,newTask) => {
-//     folders.forEach(folder => {
-//         if(folderId === folder.id){
-//             folder.tasks.forEach(task => {
-//                 if(task.id === taskId){
-//                     task.task = newTask
-//                 }
-//             })
-//         }
-//     })
-//     console.log(`Editing task ${taskId}`)
-//     printFolders()
-// }
-
-// const toggleTask = (folderId,taskId) => {
-//     folders.forEach(folder => {
-//         if(folderId === folder.id){
-//             folder.tasks.forEach(task => {
-//                 if(task.id === taskId){
-//                     task.completed = !task.completed 
-//                 }
-//             })
-//         }
-//     })
-    
-//     printFolders()
-// }
-
-// const printFolders = () => {
-//     console.log(folders)
-// }
-
-// const printTasks = (folderId) => {
-//     folders.forEach(folder => {
-//         if(folderId === folder.id){
-//             console.log(folder.tasks)
-//         }
-//     })
-// }
-
-// const PUBLIC_API = {
-//     createFolder,
-//     deleteFolder,
-//     setActiveFolder,
-//     createTask,
-//     deleteTask,
-//     editTask,
-//     toggleTask,
-//     printFolders,
-//     printTasks
-// }
-
-// export default PUBLIC_API;
