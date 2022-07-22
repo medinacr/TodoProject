@@ -21,21 +21,8 @@ $createTaskButton.addEventListener('click', (e) => {
         if($taskInput.value === ""){
             return
         }else{
-            const taskInputValue = $taskInput.value
-            const $task = document.createElement('div')
-            $task.innerHTML =
-                `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
-                <div class=" flex-1 flex items-center">
-                <input type="checkbox">
-                <p id="task-text" class="ml-3">${taskInputValue}</p>
-                </div>
-                <div class="flex-1 flex item-center justify-end">
-                    <img class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
-                    <img class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
-                </div>
-                </div></li>`
-            $taskList.appendChild($task)
-            createTask(selectedDivID,$taskInput.value) 
+            createTask(selectedDivID,$taskInput.value);
+            displayTasks();
         }
         $taskInput.value = ""
     }
@@ -123,7 +110,22 @@ const displayTasks = () => {
             //Display task list from selected folder
             folder.tasks.forEach(task => {
                 const $task = document.createElement('div')
-                $task.innerHTML =
+
+                if(task.completed){
+                    $task.innerHTML =
+                    `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
+                    <div class=" flex-1 flex items-center">
+                    <input id="${task.id}" class="completed-task ${task.id}" type="checkbox" checked>
+                    <p id="task-text" class="ml-3 task-text line-through">${task.task}</p>
+                    </div>
+                    <div class="flex-1 flex item-center justify-end">
+                        <img id= ${task.id} class="edit-button" src="https://ginnerzapata.github.io/todolist/img/edit.svg" alt="">
+                        <img id= ${task.id} class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
+                    </div>
+                    </div></li>`
+                }
+                else{
+                    $task.innerHTML =
                     `<li><div class="bg-indigo-50 rounded-xl p-3 mt-6 mx-8 flex">
                     <div class=" flex-1 flex items-center">
                     <input id="${task.id}" class="completed-task ${task.id}" type="checkbox">
@@ -134,6 +136,7 @@ const displayTasks = () => {
                         <img id= ${task.id} class="ml-2 delete-button" src="https://ginnerzapata.github.io/todolist/img/delete.svg" alt="">
                     </div>
                     </div></li>`
+                }
 
                     // delete task button listener 
                     $task.addEventListener('click', (e) => {
@@ -162,7 +165,7 @@ const displayTasks = () => {
 
                     //completed task button listener 
                     $task.addEventListener('click', (e) => {
-                        //const $taskText = document.getElementById('task-text')
+                        const $taskText = document.getElementById('task-text')
                         //find correct button 
                         let completedTask = e.target.className
                         console.log(completedTask)
@@ -173,7 +176,7 @@ const displayTasks = () => {
                             if(!taskId) return;
                             toggleTask(taskId) 
                             // $taskText.classList.add('line-through')
-                            //displayTasks()
+                            displayTasks()
                         }
                     })
 
@@ -238,7 +241,7 @@ const toggleTask = (taskId) => {
                     if(task.completed === true){
                        $taskText.classList.add('line-through')
                     }else{
-                        $taskText.classList.remove('line-through')
+                       $taskText.classList.remove('line-through')
                     }
                 }
             })
