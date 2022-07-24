@@ -1,4 +1,4 @@
-import todo from './todo.js'
+// import todo from './todo.js'
 
 // const folderId = todo.createFolder('folder 1') 
 // const folderId2 = todo.createFolder('folder 2')
